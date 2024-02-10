@@ -17,6 +17,7 @@ public class Calculator : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("ass");
         Clear();
     }
 
