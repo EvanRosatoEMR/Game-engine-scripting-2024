@@ -62,6 +62,15 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Use Key"",
+                    ""type"": ""Button"",
+                    ""id"": ""5f788d88-dc16-45bd-8df6-5955ce667c82"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -293,6 +302,17 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8e2a4367-e54b-4a11-87cd-6f3103f8d01a"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Use Key"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -884,6 +904,7 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_UseKey = m_Player.FindAction("Use Key", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -961,6 +982,7 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_UseKey;
     public struct PlayerActions
     {
         private @PlayerControllerMappings m_Wrapper;
@@ -969,6 +991,7 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Fire => m_Wrapper.m_Player_Fire;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @UseKey => m_Wrapper.m_Player_UseKey;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -990,6 +1013,9 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @UseKey.started += instance.OnUseKey;
+            @UseKey.performed += instance.OnUseKey;
+            @UseKey.canceled += instance.OnUseKey;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1006,6 +1032,9 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @UseKey.started -= instance.OnUseKey;
+            @UseKey.performed -= instance.OnUseKey;
+            @UseKey.canceled -= instance.OnUseKey;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1192,6 +1221,7 @@ public partial class @PlayerControllerMappings: IInputActionCollection2, IDispos
         void OnLook(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnUseKey(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

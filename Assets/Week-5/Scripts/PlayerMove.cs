@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -11,10 +12,22 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float rotationVertical = 5.0f;
     [SerializeField] float rotationHorizontal = 5.0f;
 
+    [SerializeField] TextMeshProUGUI HealthCounter;
+    [SerializeField] TextMeshProUGUI PillCounter;
+    [SerializeField] TextMeshProUGUI KeyCounter;
+    [SerializeField] TextMeshProUGUI DiedText;
+
     private float mouseDeltaX = 0f;
     private float mouseDeltaY = 0f;
     private float cameraRotX = 0f;
     private int rotDir = 0;
+
+    private int health = 3;
+    private int keys = 0;
+    private int pills = 0;
+
+    private bool keyTime;
+    private bool keyDown;
 
     PlayerControllerMappings playerMappings;
 
@@ -22,6 +35,7 @@ public class PlayerMove : MonoBehaviour
     InputAction fire;
     InputAction jump;
     InputAction look;
+    InputAction useKey;
 
     Rigidbody rb;
 
@@ -34,10 +48,11 @@ public class PlayerMove : MonoBehaviour
         fire = playerMappings.Player.Fire;
         jump = playerMappings.Player.Jump;
         look = playerMappings.Player.Look;
+        useKey = playerMappings.Player.UseKey;
 
         fire.performed += Fire;
         jump.performed += Jump;
-        look.performed += Look; 
+        look.performed += Look;
     }
 
     private void OnEnable()
@@ -46,6 +61,7 @@ public class PlayerMove : MonoBehaviour
         fire.Enable();
         jump.Enable();
         look.Enable();
+        useKey.Enable();
     }
 
     private void OnDisable()
@@ -54,6 +70,7 @@ public class PlayerMove : MonoBehaviour
         fire.Disable();
         jump.Disable();
         look.Disable();
+        useKey.Disable();
     }
 
     // Start is called before the first frame update
@@ -67,6 +84,12 @@ public class PlayerMove : MonoBehaviour
     {
        HandleHorizontalRotation();
        HandleVerticalRotation();
+
+        keyDown = Input.GetKey(KeyCode.E);
+
+        HealthCounter.text = "Health: " + health.ToString();
+        PillCounter.text = "Pills: " + pills.ToString();
+        KeyCounter.text = "Keys: " + keys.ToString();
     }
 
     void HandleHorizontalRotation()
@@ -118,6 +141,71 @@ public class PlayerMove : MonoBehaviour
     void Look(InputAction.CallbackContext context)
     {
 
+    }
+
+    void UseKey (InputAction.CallbackContext context)
+    {
+
+    }
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.name == "Key")
+        {
+            keys++;
+            KeyCounter.text = "Keys: " + keys.ToString();
+        }
+
+        if (collision.gameObject.name == "Trap")
+        {
+            TakeDamage();
+        }
+
+        if (collision.gameObject.name == "Pill")
+        {
+            pills++;
+            PillCounter.text = "Pills: " + pills.ToString();
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.name == "Door" && keyDown && keys > 0)
+        {
+            keys--;
+            keyTime = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.name == "Door")
+        {
+            keyTime = false;
+        }
+    }
+
+    public bool GiveKey()
+    {
+        return keyTime;
+    }
+
+    private void TakeDamage()
+    {
+        health--;
+        HealthCounter.text = "Health: " + health.ToString();
+
+        if (health <= 0)
+        {
+            //this.gameObject.SetActive(false);
+            DiedText.gameObject.SetActive(true);
+
+            move.Disable();
+            fire.Disable();
+            jump.Disable();
+            look.Disable();
+            useKey.Disable();
+        }
     }
 
     /*void HandleMovement()
