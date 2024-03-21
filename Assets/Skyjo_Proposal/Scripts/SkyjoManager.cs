@@ -24,6 +24,8 @@ public class SkyjoManager : MonoBehaviour
         {11, 4, 1, 8},
     };
 
+    private List<int> disCardNum = new List<int>();
+
     private bool[,] flipped;
 
     private int nRows;
@@ -36,6 +38,9 @@ public class SkyjoManager : MonoBehaviour
     private int theirScore;
 
     private int startTwo;
+    private int deckTopNum = -3;
+
+    private bool decking;
 
     public Button discardButton;
     public Button deckButton;
@@ -61,7 +66,23 @@ public class SkyjoManager : MonoBehaviour
 
         flipped = new bool[nRows, nCols];
 
-        for (int i = 0; i < nRows * nCols; i++)
+        for (int i = 0; i < nRows; i++)
+        {
+            for (int j = 0; j < nCols; j++)
+            {
+                yourGrid[i, j] = Random.Range(-2, 12);
+            }
+        }
+
+        Transform flip = disCardPos.Find("Back");
+        flip.gameObject.SetActive(false);
+
+        TextMeshProUGUI disCardVal;
+        disCardVal = disCardPos.GetComponentInChildren<TextMeshProUGUI>();
+
+        disCardVal.text = Random.Range(-2, 12).ToString();
+
+        for (int l = 0; l < nRows * nCols; l++)
         {
             Instantiate(cardPrefab, gridRoot);
         }
@@ -121,13 +142,27 @@ public class SkyjoManager : MonoBehaviour
 
         valueFirst.text = cardVal.ToString();
 
-        if (startTwo < 2)
+        if (startTwo < 1)
         {
             startTwo++;
         } else
         {
             discardButton.interactable = true;
             deckButton.interactable = true;
+        }
+
+        if (deckTopNum != -3 && decking)
+        {
+
+            Transform flipDeck = deckTopPos.Find("Back");
+
+            Transform flipDis = disCardPos.Find("Back");
+            valueFirst = disCardPos.GetComponentInChildren<TextMeshProUGUI>();
+
+            disCardNum.Add(deckTopNum);
+            flipDeck.gameObject.SetActive(true);
+            valueFirst.text = deckTopNum.ToString();
+            deckTopNum = -3;
         }
     }
 
@@ -148,6 +183,20 @@ public class SkyjoManager : MonoBehaviour
         
         FlipUp(cardVal);
         IncrementScore(cardVal);
+
+        TryEndGame();
+    }
+
+    public void FlipForReal(int deckVal)
+    {
+        if (flipped[row, col]) return;
+
+        flipped[row, col] = true;
+
+        yourGrid[row, col] = deckVal;
+
+        FlipUp(deckVal);
+        IncrementScore(deckVal);
 
         TryEndGame();
     }
@@ -173,24 +222,51 @@ public class SkyjoManager : MonoBehaviour
         scoreLabel.text = string.Format("Score: {0}", yourScore);
     }
 
-    void NewDisCard()
+    public void NewDisCard()
     {
-        int ran = Random.Range(-2, 12);
-        /*Instantiate(cardPrefab, disCardPos);
-
-        Transform card = GetCurrentCard();
-        Transform flip = card.Find("Back");
         TextMeshProUGUI valueFirst;
+        valueFirst = disCardPos.GetComponentInChildren<TextMeshProUGUI>();
 
-        flip.gameObject.SetActive(false);
-        valueFirst = card.GetComponentInChildren<TextMeshProUGUI>();
+        if (disCardNum.Count <= 0)
+        {
+            return;
+        }
+        else
+        {
+            FlipForReal(disCardNum[disCardNum.Count - 1]);
+            disCardNum.Remove(disCardNum.Count - 1);
 
-        valueFirst.text = ran.ToString();*/
+            if (disCardNum.Count > 0)
+            {
+                valueFirst.text = disCardNum[disCardNum.Count - 1].ToString();
+            }
+            else
+            {
+                valueFirst.text = "";
+            }
+        }
     }
 
-    void NewDeckTop()
+    public void NewDeckTop()
     {
-        int ran = Random.Range(-2, 12);
+        Transform flip = deckTopPos.Find("Back");
+
+        TextMeshProUGUI valueFirst;
+        valueFirst = deckTopPos.GetComponentInChildren<TextMeshProUGUI>();
+
+        if (valueFirst.text == "test")
+        {
+            deckTopNum = Random.Range(-2, 12);
+
+            flip.gameObject.SetActive(false);
+            valueFirst.text = deckTopNum.ToString();
+        }
+        else
+        {
+            FlipForReal(deckTopNum);
+            valueFirst.text = "test";
+            flip.gameObject.SetActive(true);
+        }
     }
 
     // Start is called before the first frame update
