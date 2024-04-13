@@ -20,7 +20,12 @@ public class TrapController : MonoBehaviour
     {
         if (other.gameObject.name == "Player")
         {
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
         }
+    }
+
+    public void SetActiveForGodsSake()
+    {
+        this.gameObject.SetActive(true);
     }
 }

@@ -20,7 +20,12 @@ public class KeyController : MonoBehaviour
     {
         if (other.gameObject.name == "Player")
         {
-            Destroy(this.gameObject);
+            gameObject.SetActive(false);
         }
+    }
+
+    public void SetActiveForGodsSake()
+    {
+        gameObject.SetActive(true);
     }
 }

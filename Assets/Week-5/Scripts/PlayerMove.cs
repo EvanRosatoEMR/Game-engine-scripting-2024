@@ -208,6 +208,29 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    public void reStart()
+    {
+        move.Enable();
+        fire.Enable();
+        jump.Enable();
+        look.Enable();
+        useKey.Enable();
+
+        transform.position = new Vector3(0, 1.06f, -67.9f);
+        transform.eulerAngles = new Vector3(0, 0, 0);
+        Camera.main.transform.localRotation = Quaternion.Euler(0, 0, 0);
+
+        health = 3;
+        HealthCounter.text = "Health: " + health.ToString();
+
+        keys = 0;
+        keyTime = false; ;
+        KeyCounter.text = "Keys: " + keys.ToString();
+
+        pills = 0;
+        PillCounter.text = "Pills: " + pills.ToString();
+    }
+
     /*void HandleMovement()
     {
         Vector3 input = (Input.GetAxis("Horizontal") * transform.right) + (transform.forward * Input.GetAxis("Vertical"));
